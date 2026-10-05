@@ -76,11 +76,11 @@ Evaluate this raw market data and return strictly valid JSON matching your syste
 """
 
     try:
-        interaction = client.interactions.create(
-            model="gemini-2.5-flash",
-            input=prompt_content,
+        response = client.models.generate_content(
+            model="gemini-3.8-flash",
+            contents=prompt_content,
         )
-        return interaction.output_text
+        return response.text
     except Exception as e:
         print(f"\n--- GEMINI API ERROR ---\nDetails: {e}")
         traceback.print_exc()
