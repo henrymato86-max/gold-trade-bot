@@ -87,7 +87,7 @@ Evaluate this market data and return strictly valid JSON matching your schema.
 
     try:
         response = client.models.generate_content(
-            model="gemini-3.8-flash",
+            model="gemini-2.0-flash",
             contents=prompt_content,
         )
         return response.text
