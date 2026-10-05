@@ -37,28 +37,31 @@ def send_telegram_alert(message):
 
 
 def fetch_gold_data():
-    print("Fetching market data for XAU/USD...")
+    print("Fetching macro market data for XAU/USD swing analysis...")
     try:
-        ts_4h = td.time_series(
-            symbol="XAU/USD", interval="4h", outputsize=15
+        # Daily Chart (Macro Trend & Major S/R)
+        ts_1d = td.time_series(
+            symbol="XAU/USD", interval="1day", outputsize=30
         ).with_rsi(time_period=14)
+        data_1d = ts_1d.as_json()
+
+        # 4-Hour Chart (Structural Swing Entries)
+        ts_4h = (
+            td.time_series(symbol="XAU/USD", interval="4h", outputsize=30)
+            .with_rsi(time_period=14)
+            .with_ema(time_period=50)
+        )
         data_4h = ts_4h.as_json()
 
-        ts_30m = (
-            td.time_series(symbol="XAU/USD", interval="30min", outputsize=15)
-            .with_rsi(time_period=14)
-            .with_ema(time_period=20)
-        )
-        data_30m = ts_30m.as_json()
-
-        ts_5m = td.time_series(
-            symbol="XAU/USD", interval="5min", outputsize=15
+        # 1-Hour Chart (Execution & Refinement)
+        ts_1h = td.time_series(
+            symbol="XAU/USD", interval="1h", outputsize=30
         ).with_rsi(time_period=14)
-        data_5m = ts_5m.as_json()
+        data_1h = ts_1h.as_json()
 
         return {
             "asset": "XAU/USD (Gold)",
-            "timeframes": {"4H": data_4h, "30m": data_30m, "5m": data_5m},
+            "timeframes": {"1D": data_1d, "4H": data_4h, "1H": data_1h},
         }
     except Exception as e:
         print(f"Error fetching TwelveData market data: {e}")
@@ -66,11 +69,18 @@ def fetch_gold_data():
 
 
 def analyze_market_with_gemini(payload):
-    print("Analyzing market structure with Gemini...")
+    print("Analyzing market structure for swing trade opportunities...")
 
     prompt_content = f"""
-You are an institutional trading analysis engine specialized in Gold (XAU/USD).
-Evaluate this raw market data and return strictly valid JSON matching your system schema.
+You are an institutional macro swing trading analyst specializing in Gold (XAU/USD).
+Your objective is to generate low-frequency, high-probability SWING TRADE setups meant to be held for several days to weeks.
+
+Focus on:
+1. Daily structural trend, key liquidity sweeps, and major supply/demand zones.
+2. 4H and 1H market structure shifts for entry refinement.
+3. Wide stop losses based on structural invalidation and targets with at least 1:3 Risk-to-Reward ratio.
+
+Evaluate this market data and return strictly valid JSON matching your schema.
 
 {json.dumps(payload)}
 """
@@ -88,14 +98,14 @@ Evaluate this raw market data and return strictly valid JSON matching your syste
 
 
 def main():
-    print(f"--- Starting Scheduled Scan ---")
+    print(f"--- Starting Macro Swing Analysis Scan ---")
     live_data = fetch_gold_data()
 
     if live_data:
         trade_analysis = analyze_market_with_gemini(live_data)
         if trade_analysis:
             alert_text = (
-                f"🚨 *XAU/USD LIVE TRADE SETUP* 🚨\n\n{trade_analysis}\n"
+                f"📊 *XAU/USD MACRO SWING SETUP* 📊\n\n{trade_analysis}\n"
             )
             send_telegram_alert(alert_text)
 
