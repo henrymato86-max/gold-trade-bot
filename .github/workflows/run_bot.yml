@@ -2,9 +2,9 @@ name: XAUUSD Trade Analysis Cron
 
 on:
   schedule:
-    # Runs every 2 hours automatically 24/7
-    - cron: '0 */2 * * * *'
-  workflow_dispatch:
+    # Runs every 30 minutes automatically 24/7
+    - cron: '*/30 * * * *'
+  workflow_dispatch: # Allows manual run button in GitHub
 
 jobs:
   run-analysis:
