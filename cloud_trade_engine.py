@@ -1,15 +1,13 @@
-from datetime import datetime
-import json
 import os
-import sys
+import json
 import traceback
 from google import genai
 import requests
 from twelvedata import TDClient
 
-# ==========================================
+# =====================================================================
 # ENVIRONMENT VARIABLES (Set in Cloud Provider)
-# ==========================================
+# =====================================================================
 TWELVEDATA_KEY = os.getenv("TWELVEDATA_KEY")
 GEMINI_KEY = os.getenv("GEMINI_KEY")
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
@@ -71,15 +69,15 @@ def analyze_market_with_gemini(payload):
     print("Analyzing market structure with Gemini...")
 
     prompt_content = f"""
-    You are an institutional trading analysis engine specialized in Gold (XAU/USD).
-    Evaluate this raw market data and return strictly valid JSON matching your system schema:
-    
-    {json.dumps(payload)}
-    """
+You are an institutional trading analysis engine specialized in Gold (XAU/USD).
+Evaluate this raw market data and return strictly valid JSON matching your system schema.
+
+{json.dumps(payload)}
+"""
 
     try:
         interaction = client.interactions.create(
-            model="gemini-3.8-flash",
+            model="gemini-2.5-flash",
             input=prompt_content,
         )
         return interaction.output_text
@@ -90,14 +88,14 @@ def analyze_market_with_gemini(payload):
 
 
 def main():
-    print(f"--- Starting Scheduled Scan: {datetime.now()} ---")
+    print(f"--- Starting Scheduled Scan ---")
     live_data = fetch_gold_data()
 
     if live_data:
         trade_analysis = analyze_market_with_gemini(live_data)
         if trade_analysis:
             alert_text = (
-                f"🚨 *XAU/USD LIVE TRADE SETUP* 🚨\n\n```json\n{trade_analysis}\n```"
+                f"🚨 *XAU/USD LIVE TRADE SETUP* 🚨\n\n{trade_analysis}\n"
             )
             send_telegram_alert(alert_text)
 
