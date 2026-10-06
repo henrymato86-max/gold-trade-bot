@@ -5,6 +5,10 @@ on:
     # Runs every 2 hours automatically 24/7
     - cron: '0 */2 * * *'
   workflow_dispatch:
+  
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   run-analysis:
